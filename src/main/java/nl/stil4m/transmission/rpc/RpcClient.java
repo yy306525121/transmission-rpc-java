@@ -1,5 +1,8 @@
 package nl.stil4m.transmission.rpc;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.text.StrPool;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.stil4m.transmission.http.InvalidResponseStatus;
@@ -14,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,8 +57,8 @@ public class RpcClient {
     }
 
     private <T, V> void executeCommandInner(RpcCommand<T, V> command, Map<String, String> h) throws RequestExecutorException, InvalidResponseStatus, IOException, RpcException {
+        requestExecutor.removeAllHeaders();
         for (Map.Entry<String, String> entry : h.entrySet()) {
-            requestExecutor.removeAllHeaders();
             requestExecutor.configureHeader(entry.getKey(), entry.getValue());
         }
 
@@ -77,6 +81,13 @@ public class RpcClient {
     private void setup() throws RpcException {
         try {
             HttpPost httpPost = createPost();
+            if (StrUtil.isNotEmpty(configuration.getUsername()) && StrUtil.isNotEmpty(configuration.getPassword())) {
+                String auth = configuration.getUsername() + StrPool.COLON + configuration.getPassword();
+                String encodedAuth = Base64.encode(auth.getBytes(StandardCharsets.UTF_8));
+                httpPost.setHeader("Authorization", "Basic " + encodedAuth);
+                putAuthorizationHeader(encodedAuth);
+            }
+
             HttpResponse result = defaultHttpClient.execute(httpPost);
             putSessionHeader(result);
             EntityUtils.consume(result.getEntity());
@@ -99,5 +110,9 @@ public class RpcClient {
 
     private void putSessionHeader(HttpResponse result) {
         headers.put("X-Transmission-Session-Id", result.getFirstHeader("X-Transmission-Session-Id").getValue());
+    }
+
+    private void putAuthorizationHeader(String encodedAuth) {
+        headers.put("Authorization", "Basic " + encodedAuth);
     }
 }

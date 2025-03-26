@@ -9,10 +9,13 @@ public class FreeSpaceResult {
 
     private Long sizeBytes;
 
+    private Long totalSize;
+
     @JsonCreator
-    public FreeSpaceResult(@JsonProperty("path") String path, @JsonProperty("size-bytes") Long sizeBytes) {
+    public FreeSpaceResult(@JsonProperty("path") String path, @JsonProperty("size-bytes") Long sizeBytes, @JsonProperty("total_size") Long totalSize) {
         this.path = path;
         this.sizeBytes = sizeBytes;
+        this.totalSize = totalSize;
     }
 
     public String getPath() {
@@ -21,5 +24,9 @@ public class FreeSpaceResult {
 
     public Long getSizeBytes() {
         return sizeBytes;
+    }
+
+    public Long getTotalSize() {
+        return totalSize;
     }
 }

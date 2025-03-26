@@ -31,7 +31,9 @@ public class FreeSpaceIntegrationTest extends IntegrationTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         RpcConfiguration rpcConfiguration = new RpcConfiguration();
-        rpcConfiguration.setHost(URI.create("http://localhost:9091/transmission/rpc"));
+        rpcConfiguration.setHost(URI.create("https://download.codeyang.cn:82/transmission/rpc"));
+        rpcConfiguration.setUsername("yangzy");
+        rpcConfiguration.setPassword("ywzy8Ags6G3k$4");
         RpcClient client = new RpcClient(rpcConfiguration, objectMapper);
         rpcClient = new TransmissionRpcClient(client);
         pause();
